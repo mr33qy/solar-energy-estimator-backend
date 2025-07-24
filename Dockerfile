@@ -1,17 +1,20 @@
-# Use official Java 21 runtime
+# Use official Java 21 image
 FROM eclipse-temurin:21-jdk
 
-# Set working directory inside container
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy everything into container
+# Copy all files from backend folder into the container
 COPY . .
 
-# Build the Spring Boot project using Maven wrapper
+# Ensure Maven wrapper is executable (fixes permission denied)
+RUN chmod +x mvnw
+
+# Build the Spring Boot project without running tests
 RUN ./mvnw clean package -DskipTests
 
-# Expose the port (Render injects it into $PORT)
+# Expose the port (Render sets this using the $PORT env variable)
 EXPOSE 8080
 
-# Run the JAR file (Render handles the port variable automatically)
+# Run the application JAR (matches output from Maven package)
 CMD ["sh", "-c", "java -jar target/*.jar"]
